@@ -24,7 +24,8 @@ export async function getProducts() {
 
     const data = await res.json();
 
-    console.log(data);console.log(
+    console.log(
+      'FULL WR RESPONSE:',
       JSON.stringify(data, null, 2)
     );
 
