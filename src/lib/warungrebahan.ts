@@ -18,7 +18,8 @@ export async function getProducts() {
 
         body: JSON.stringify({
           api_key: API_KEY
-        })
+        }),
+        cache: 'no-store'
       }
     );
 
@@ -35,7 +36,12 @@ export async function getProducts() {
       );
     }
 
-    return data.data.map((product: any) => ({
+    const products =
+        data.data ||
+        data.products ||
+        [];
+
+      return products.map((product: any) => ({
       ...product,
 
       variants: product.variants.map((variant: any) => ({
