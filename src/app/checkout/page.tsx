@@ -44,10 +44,10 @@ function CheckoutForm() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-gray-900 rounded-2xl p-6 border border-gray-800">
+    <main className="min-h-screen bg-transparent text-gray-900 flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl p-6 border border-purple-100">
         <h1 className="text-xl font-bold mb-1">Checkout</h1>
-        <div className="bg-gray-800 rounded-xl p-3 mb-6">
+        <div className="bg-purple-50 rounded-xl p-3 mb-6">
           <div className="text-sm text-gray-400">{productName}</div>
           <div className="font-semibold">{variantName}</div>
           <div className="text-purple-400 font-bold text-lg">Rp {price.toLocaleString('id-ID')}</div>
@@ -55,17 +55,17 @@ function CheckoutForm() {
         <div className="space-y-4">
           <div>
             <label className="text-sm text-gray-400 mb-1 block">Nama Lengkap *</label>
-            <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500"
+            <input className="w-full bg-purple-50 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500"
               value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Nama kamu"/>
           </div>
           <div>
             <label className="text-sm text-gray-400 mb-1 block">Nomor WhatsApp *</label>
-            <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500"
+            <input className="w-full bg-purple-50 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500"
               value={form.whatsapp} onChange={e => setForm({...form, whatsapp: e.target.value})} placeholder="08xxxxxxxxxx"/>
           </div>
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">Email (opsional)</label>
-            <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500"
+            <label className="text-sm text-gray-400 mb-1 block">Email (wajib)</label>
+            <input className="w-full bg-purple-50 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500"
               value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="email@kamu.com"/>
           </div>
           <button onClick={handleOrder} disabled={loading}

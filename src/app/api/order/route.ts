@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
         },
 
         enabled_payments: [
-          'qris'
+          'bri_va'
         ]
       });
 
