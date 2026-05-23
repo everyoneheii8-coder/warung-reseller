@@ -97,11 +97,17 @@ export async function POST(req: NextRequest) {
 
   } catch (err: any) {
 
-    console.error(err);
+  console.error(
+    'MIDTRANS / ORDER ERROR:',
+    err
+  );
 
-    return NextResponse.json({
-      success: false,
-      message: err.message
-    });
-  }
+  return NextResponse.json({
+    success: false,
+    message:
+      err?.ApiResponse?.error_messages?.[0] ||
+      err?.message ||
+      'Unknown error'
+  });
+}
 }
