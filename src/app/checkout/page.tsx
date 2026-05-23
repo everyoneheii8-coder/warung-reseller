@@ -30,7 +30,8 @@ function CheckoutForm() {
       })
     });
     const data = await res.json();
-   console.log(data);
+
+console.log(data);
 
 if (data.redirectUrl) {
 
@@ -46,18 +47,7 @@ if (data.redirectUrl) {
 
   setLoading(false);
 }
-
-      window.location.href =
-        data.redirectUrl;
-
-    } else {
-
-      alert('Gagal membuat order');
-
-      setLoading(false);
-    }
-  };
-
+};
   return (
     <main className="min-h-screen bg-transparent text-gray-900 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-2xl p-6 border border-purple-100">
