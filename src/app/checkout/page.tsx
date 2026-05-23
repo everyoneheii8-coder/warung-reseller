@@ -30,7 +30,22 @@ function CheckoutForm() {
       })
     });
     const data = await res.json();
-   if (data.success) {
+   console.log(data);
+
+if (data.redirectUrl) {
+
+  window.location.href =
+    data.redirectUrl;
+
+} else {
+
+  alert(
+    data.message ||
+    'Gagal membuat order'
+  );
+
+  setLoading(false);
+}
 
       window.location.href =
         data.redirectUrl;
