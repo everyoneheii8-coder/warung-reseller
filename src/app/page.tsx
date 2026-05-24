@@ -184,7 +184,7 @@ export default function Home() {
           font-family: 'Playfair Display', serif;
           font-size: 32px;
           font-weight: 900;
-          color: #1c1917;
+          color: #ffffff;
           margin-bottom: 8px;
           position: relative;
         }
@@ -198,7 +198,7 @@ export default function Home() {
 
         .hero-sub {
           font-family: 'DM Sans', sans-serif;
-          color: #78716c;
+          color: #d1d5db;
           font-size: 15px;
           margin-bottom: 24px;
         }

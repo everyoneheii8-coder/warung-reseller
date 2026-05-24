@@ -7,7 +7,8 @@ export async function POST(req: NextRequest) {
   try {
 
     const body = await req.json();
-
+    const ADMIN_WHATSAPP =
+  '6287851853393';
     const {
       buyerName,
       buyerWhatsapp,
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
       [
         invoiceId,
         buyerName,
-        buyerWhatsapp,
+        ADMIN_WHATSAPP,
         buyerEmail,
         productName,
         variantName,
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
     );
 
     // create midtrans transaction
-    const transaction =
+    /*const transaction =
       await snap.createTransaction({
 
         transaction_details: {
@@ -94,7 +95,11 @@ export async function POST(req: NextRequest) {
       redirectUrl:
         transaction.redirect_url
     });
-
+*/
+return NextResponse.json({
+  success: true,
+  orderId: result.insertId
+});
   } catch (err: any) {
 
   console.error(

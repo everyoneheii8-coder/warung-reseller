@@ -1,7 +1,11 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Suspense, use } from 'react';
+import {
+  Suspense,
+  use,
+  useState
+} from 'react';
 
 function InvoiceContent({
   orderId
@@ -22,30 +26,45 @@ function InvoiceContent({
 
   const accName =
     params.get('accName') || '';
+  const productName =
+  params.get('productName') || '';
+
+  const variantName =
+  params.get('variantName') || '';
+
+  const [
+  processed,
+  setProcessed
+] = useState(false);
+
+const [
+  proof,
+  setProof
+] = useState<File | null>(null);
+
+const [
+  showProcess,
+  setShowProcess
+] = useState(false);
 
   return (
 
     <main
       style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #fffbe6 0%, #fff8d6 30%, #fef3c7 60%, #fde68a 100%)',
+        background: 'transparent',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         padding: '40px 16px',
         position: 'relative',
         overflow: 'hidden',
-        fontFamily: "'Playfair Display', 'Georgia', serif",
+        fontFamily: "'DM Sans', sans-serif",
       }}
     >
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@400;500;600&display=swap');
-
-        @keyframes shimmer {
-          0% { background-position: -400px 0; }
-          100% { background-position: 400px 0; }
-        }
 
         @keyframes floatUp {
           0%, 100% { transform: translateY(0px); }
@@ -53,101 +72,137 @@ function InvoiceContent({
         }
 
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
+          from { opacity: 0; transform: translateY(24px); }
           to { opacity: 1; transform: translateY(0); }
         }
 
-        .gold-card {
+        @keyframes shimmerBtn {
+          0%   { background-position: 100% 0; }
+          100% { background-position: -100% 0; }
+        }
+
+        .inv-card {
           animation: fadeIn 0.6s ease forwards;
         }
 
-        .gold-icon {
+        .inv-icon {
           animation: floatUp 3s ease-in-out infinite;
         }
 
-        .shimmer-btn {
-          background: linear-gradient(90deg, #b45309, #d97706, #f59e0b, #fbbf24, #f59e0b, #d97706, #b45309);
-          background-size: 400px 100%;
-          animation: shimmer 2.5s linear infinite;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .shimmer-btn:hover {
-          transform: scale(1.02);
-          box-shadow: 0 12px 40px rgba(180, 83, 9, 0.4) !important;
-        }
-
-        .shimmer-btn:active {
-          transform: scale(0.98);
-        }
-
-        .row-item {
-          font-family: 'DM Sans', sans-serif;
-        }
-
-        .divider-gold {
+        .inv-divider {
           border: none;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+          height: 0.5px;
+          background: linear-gradient(90deg, transparent, rgba(180,160,255,0.25), transparent);
+          margin: 14px 0;
         }
-      `}</style>
 
-      {/* Decorative Blobs */}
-      <div style={{
-        position: 'absolute', top: -100, left: -100,
-        width: 300, height: 300,
-        background: 'radial-gradient(circle, rgba(251,191,36,0.35) 0%, transparent 70%)',
-        borderRadius: '50%',
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', bottom: -100, right: -100,
-        width: 350, height: 350,
-        background: 'radial-gradient(circle, rgba(245,158,11,0.3) 0%, transparent 70%)',
-        borderRadius: '50%',
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', top: '40%', right: -60,
-        width: 200, height: 200,
-        background: 'radial-gradient(circle, rgba(253,230,138,0.5) 0%, transparent 70%)',
-        borderRadius: '50%',
-        pointerEvents: 'none',
-      }} />
+        .inv-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-family: 'DM Sans', sans-serif;
+          margin-bottom: 12px;
+        }
+
+        .inv-label {
+          font-size: 13px;
+          color: rgba(196,176,255,0.55);
+          font-weight: 500;
+        }
+
+        .inv-value {
+          font-size: 14px;
+          font-weight: 700;
+          color: #e8e6f0;
+        }
+
+        .btn-whatsapp {
+          display: block;
+          width: 100%;
+          padding: 15px;
+          border-radius: 16px;
+          text-decoration: none;
+          text-align: center;
+          background: linear-gradient(135deg, #16a34a, #22c55e, #16a34a);
+          background-size: 200% 100%;
+          animation: shimmerBtn 2.5s linear infinite;
+          color: #fff;
+          font-family: 'Playfair Display', serif;
+          font-weight: 700;
+          font-size: 16px;
+          letter-spacing: 0.4px;
+          box-shadow: 0 6px 28px rgba(34,197,94,0.3);
+          transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .btn-whatsapp:hover {
+          transform: scale(1.02);
+          box-shadow: 0 10px 36px rgba(34,197,94,0.45);
+        }
+
+        .btn-whatsapp:active { transform: scale(0.97); }
+
+        .btn-process {
+          width: 100%;
+          margin-top: 12px;
+          padding: 15px;
+          border-radius: 16px;
+          border: none;
+          background: linear-gradient(90deg, #6d3fc4, #4f7de0, #9b59d6, #4f7de0, #6d3fc4);
+          background-size: 300% 100%;
+          animation: shimmerBtn 2.2s linear infinite;
+          color: #fff;
+          font-weight: 700;
+          font-size: 15px;
+          font-family: 'DM Sans', sans-serif;
+          box-shadow: 0 6px 28px rgba(109,63,196,0.35);
+          transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+        }
+
+        .btn-process:hover:not(:disabled) {
+          transform: scale(1.02);
+          box-shadow: 0 10px 36px rgba(109,63,196,0.5);
+        }
+
+        .btn-process:active:not(:disabled) { transform: scale(0.97); }
+        .btn-process:disabled { opacity: 0.5; cursor: not-allowed; animation: none; background: rgba(109,63,196,0.3); }
+      `}</style>
 
       {/* Card */}
       <div
-        className="gold-card"
+        className="inv-card"
         style={{
           width: '100%',
           maxWidth: 440,
-          borderRadius: 32,
-          background: 'linear-gradient(160deg, #ffffff 0%, #fffbeb 60%, #fef9ee 100%)',
-          border: '1.5px solid rgba(251,191,36,0.5)',
-          boxShadow: '0 24px 64px rgba(180,83,9,0.15), 0 4px 16px rgba(251,191,36,0.2), inset 0 1px 0 rgba(255,255,255,0.9)',
+          borderRadius: 28,
+          background: 'linear-gradient(160deg, rgba(30,24,54,0.95) 0%, rgba(20,18,40,0.98) 100%)',
+          border: '0.5px solid rgba(180,160,255,0.2)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
           padding: '32px 28px',
+          position: 'relative',
+          backdropFilter: 'blur(20px)',
         }}
       >
 
         {/* Corner ornaments */}
-        <div style={{ position: 'absolute', top: 16, left: 16, width: 20, height: 20,
-          borderTop: '2px solid #f59e0b', borderLeft: '2px solid #f59e0b', borderRadius: '4px 0 0 0' }} />
-        <div style={{ position: 'absolute', top: 16, right: 16, width: 20, height: 20,
-          borderTop: '2px solid #f59e0b', borderRight: '2px solid #f59e0b', borderRadius: '0 4px 0 0' }} />
+        <div style={{ position: 'absolute', top: 16, left: 16, width: 18, height: 18,
+          borderTop: '1.5px solid rgba(196,176,255,0.4)', borderLeft: '1.5px solid rgba(196,176,255,0.4)', borderRadius: '4px 0 0 0' }} />
+        <div style={{ position: 'absolute', top: 16, right: 16, width: 18, height: 18,
+          borderTop: '1.5px solid rgba(196,176,255,0.4)', borderRight: '1.5px solid rgba(196,176,255,0.4)', borderRadius: '0 4px 0 0' }} />
 
         {/* Icon */}
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
 
           <div
-            className="gold-icon"
+            className="inv-icon"
             style={{
-              width: 88, height: 88, margin: '0 auto 16px',
-              borderRadius: 28,
-              background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 40%, #fde68a 70%, #f59e0b 100%)',
+              width: 84, height: 84, margin: '0 auto 16px',
+              borderRadius: 26,
+              background: 'linear-gradient(135deg, #6d3fc4, #4f7de0)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 40,
-              boxShadow: '0 8px 32px rgba(245,158,11,0.5), inset 0 1px 0 rgba(255,255,255,0.4)',
-              border: '2px solid rgba(255,255,255,0.6)',
+              fontSize: 38,
+              boxShadow: '0 8px 32px rgba(109,63,196,0.5), inset 0 1px 0 rgba(255,255,255,0.15)',
+              border: '1px solid rgba(255,255,255,0.1)',
             }}
           >
             💳
@@ -155,16 +210,19 @@ function InvoiceContent({
 
           <h1 style={{
             fontFamily: "'Playfair Display', serif",
-            fontSize: 28, fontWeight: 900,
-            color: '#78350f',
-            margin: 0, letterSpacing: '-0.5px',
+            fontSize: 26, fontWeight: 900,
+            background: 'linear-gradient(90deg, #d4c4ff, #a8d4ff)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            margin: 0,
           }}>
             Invoice Pembayaran
           </h1>
 
           <p style={{
             fontFamily: "'DM Sans', sans-serif",
-            color: '#a16207', marginTop: 6, fontSize: 14, fontWeight: 500,
+            color: 'rgba(196,176,255,0.5)', marginTop: 6, fontSize: 13, fontWeight: 500,
           }}>
             Selesaikan pembayaran untuk melanjutkan
           </p>
@@ -174,143 +232,235 @@ function InvoiceContent({
         {/* Order ID */}
         <div
           style={{
-            background: 'linear-gradient(135deg, #fffbeb, #fef3c7)',
-            border: '1px solid rgba(251,191,36,0.4)',
-            borderRadius: 20,
+            background: 'rgba(109,63,196,0.15)',
+            border: '0.5px solid rgba(196,176,255,0.2)',
+            borderRadius: 16,
             padding: '12px 16px',
             textAlign: 'center',
             marginBottom: 20,
           }}
         >
-
           <div style={{
             fontFamily: "'DM Sans', sans-serif",
-            fontSize: 11, color: '#92400e', textTransform: 'uppercase',
+            fontSize: 10, color: 'rgba(196,176,255,0.5)', textTransform: 'uppercase',
             letterSpacing: '1.5px', fontWeight: 600,
           }}>
             Order ID
           </div>
-
-          <div
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: 18, fontWeight: 900,
-              color: '#92400e',
-              marginTop: 4,
-              letterSpacing: 1,
-            }}
-          >
+          <div style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 17, fontWeight: 900,
+            color: '#d4c4ff',
+            marginTop: 4, letterSpacing: 1,
+          }}>
             {orderId}
           </div>
-
         </div>
 
         {/* Payment Detail */}
         <div
           style={{
-            background: 'linear-gradient(160deg, #ffffff, #fffbeb)',
-            borderRadius: 24,
-            border: '1px solid rgba(251,191,36,0.35)',
-            boxShadow: '0 4px 20px rgba(245,158,11,0.08)',
-            padding: '20px 20px',
+            background: 'rgba(255,255,255,0.03)',
+            borderRadius: 20,
+            border: '0.5px solid rgba(180,160,255,0.15)',
+            padding: '18px 18px 6px',
             marginBottom: 16,
           }}
         >
-
-          <div className="row-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-
-            <span style={{ color: '#a16207', fontSize: 14, fontWeight: 500 }}>
-              Total Bayar
-            </span>
-
-            <span
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: 28, fontWeight: 900,
-                background: 'linear-gradient(90deg, #b45309, #d97706, #f59e0b)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              Rp {amount.toLocaleString('id-ID')}
-            </span>
-
-          </div>
-
-          <hr className="divider-gold" style={{ marginBottom: 16 }} />
-
-          <div className="row-item" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-            <span style={{ color: '#a16207', fontSize: 14, fontWeight: 500 }}>Metode</span>
-            <span style={{ fontWeight: 700, color: '#78350f', fontSize: 14 }}>{bank}</span>
-          </div>
-
-          <div className="row-item" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-            <span style={{ color: '#a16207', fontSize: 14, fontWeight: 500 }}>Rekening</span>
+          <div className="inv-row" style={{ marginBottom: 14 }}>
+            <span className="inv-label">Total Bayar</span>
             <span style={{
               fontFamily: "'Playfair Display', serif",
-              fontWeight: 900, color: '#92400e', fontSize: 15, letterSpacing: 1,
+              fontSize: 26, fontWeight: 900,
+              background: 'linear-gradient(90deg, #d4c4ff, #a8d4ff)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
             }}>
+              Rp {amount.toLocaleString('id-ID')}
+            </span>
+          </div>
+
+          <hr className="inv-divider" />
+
+          <div className="inv-row">
+            <span className="inv-label">Metode</span>
+            <span className="inv-value">{bank}</span>
+          </div>
+
+          <div className="inv-row">
+            <span className="inv-label">Rekening</span>
+            <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, color: '#c4b0ff', fontSize: 15, letterSpacing: 1 }}>
               {acc}
             </span>
           </div>
 
-          <div className="row-item" style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: '#a16207', fontSize: 14, fontWeight: 500 }}>Atas Nama</span>
-            <span style={{ fontWeight: 600, color: '#78350f', fontSize: 14 }}>{accName}</span>
+          <div className="inv-row">
+            <span className="inv-label">Atas Nama</span>
+            <span className="inv-value">{accName}</span>
+          </div>
+        </div>
+
+        {/* Upload Bukti */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontWeight: 700, marginBottom: 10, color: '#d4c4ff', fontSize: 14, fontFamily: "'DM Sans', sans-serif" }}>
+            Upload Bukti Transfer
+          </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files?.[0]) {
+                setProof(e.target.files[0]);
+              }
+            }}
+            style={{
+              width: '100%',
+              padding: '11px 14px',
+              borderRadius: 12,
+              border: '0.5px solid rgba(196,176,255,0.25)',
+              background: 'rgba(255,255,255,0.04)',
+              color: 'rgba(196,176,255,0.7)',
+              fontSize: 13,
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          />
+          {proof && (
+            <img
+              src={URL.createObjectURL(proof)}
+              style={{
+                width: '100%',
+                borderRadius: 16,
+                marginTop: 12,
+                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+              }}
+            />
+          )}
+        </div>
+
+        {/* QRIS */}
+        <div
+          style={{
+            background: 'rgba(255,255,255,0.03)',
+            borderRadius: 20,
+            border: '0.5px solid rgba(180,160,255,0.15)',
+            padding: '18px',
+            marginBottom: 16,
+            textAlign: 'center',
+          }}
+        >
+          <div style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 17, fontWeight: 800,
+            color: '#d4c4ff',
+            marginBottom: 14,
+          }}>
+            Scan QRIS Pembayaran
           </div>
 
+          <img
+            src="/qris.jpeg"
+            style={{
+              width: '100%',
+              borderRadius: 16,
+              marginBottom: 14,
+              boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+            }}
+          />
+
+          <div
+            style={{
+              background: 'rgba(109,63,196,0.15)',
+              border: '0.5px solid rgba(196,176,255,0.2)',
+              padding: '14px',
+              borderRadius: 14,
+              color: 'rgba(220,210,255,0.85)',
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 13,
+              fontWeight: 600,
+              lineHeight: 1.7,
+            }}
+          >
+            ⚠️ Transfer tepat sesuai nominal:
+            <br />
+            <span style={{
+              fontSize: 22, fontWeight: 900,
+              fontFamily: "'Playfair Display', serif",
+              background: 'linear-gradient(90deg, #d4c4ff, #a8d4ff)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>
+              Rp {amount.toLocaleString('id-ID')}
+            </span>
+            <br />
+            agar pembayaran dapat diproses otomatis.
+          </div>
         </div>
 
         {/* Warning */}
         <div
           style={{
-            background: 'linear-gradient(135deg, #fffbeb, #fef9c3)',
-            border: '1px solid rgba(234,179,8,0.4)',
-            borderRadius: 18,
-            padding: '14px 16px',
+            background: 'rgba(234,179,8,0.08)',
+            border: '0.5px solid rgba(234,179,8,0.25)',
+            borderRadius: 14,
+            padding: '12px 16px',
             fontSize: 13,
-            color: '#854d0e',
+            color: 'rgba(253,230,138,0.8)',
             marginBottom: 20,
             fontFamily: "'DM Sans', sans-serif",
             fontWeight: 500,
-            lineHeight: 1.5,
+            lineHeight: 1.6,
           }}
         >
           ⚠️ Transfer tepat sesuai nominal agar pembayaran terdeteksi otomatis.
         </div>
 
-        {/* Button */}
-        <button
-          className="shimmer-btn"
-          style={{
-            width: '100%',
-            padding: '16px',
-            borderRadius: 20,
-            border: 'none',
-            color: '#451a03',
-            fontFamily: "'Playfair Display', serif",
-            fontWeight: 700,
-            fontSize: 17,
-            cursor: 'pointer',
-            boxShadow: '0 8px 32px rgba(180,83,9,0.3)',
-            letterSpacing: 0.5,
-          }}
+        {/* Button WA */}
+        <a
+          onClick={() => { setShowProcess(true); }}
+          href={`https://wa.me/6287851853393?text=${encodeURIComponent(
+            `Halo admin, saya sudah transfer untuk order:\n\nOrder ID: ${orderId}\nProduk: ${productName}\nVarian: ${variantName}\nTotal: Rp ${amount.toLocaleString('id-ID')}\nkirim bukti tf nya disini yaa, terimakasih 🙏`
+          )}`}
+          target="_blank"
+          className="btn-whatsapp"
         >
-          ✦ Saya Sudah Bayar ✦
-        </button>
+          ✅ Saya Sudah Bayar
+        </a>
+
+        {/* Button Proses Otomatis */}
+        {showProcess && !processed && (
+          <button
+            disabled={processed}
+            onClick={async () => {
+              const res = await fetch('/api/process-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId }),
+              });
+              const data = await res.json();
+              if (data.success) {
+                setProcessed(true);
+                alert('Order berhasil diproses otomatis!');
+              } else {
+                alert(data.message);
+              }
+            }}
+            className="btn-process"
+          >
+            🚀 Proses Order Otomatis
+          </button>
+        )}
 
         {/* Footer */}
-        <p
-          style={{
-            textAlign: 'center',
-            fontSize: 13,
-            color: '#a16207',
-            marginTop: 18,
-            fontFamily: "'DM Sans', sans-serif",
-            fontWeight: 500,
-          }}
-        >
+        <p style={{
+          textAlign: 'center',
+          fontSize: 12,
+          color: 'rgba(196,176,255,0.4)',
+          marginTop: 20,
+          fontFamily: "'DM Sans', sans-serif",
+          fontWeight: 500,
+        }}>
           Produk akan dikirim otomatis ke WhatsApp setelah pembayaran berhasil ✅
         </p>
 
